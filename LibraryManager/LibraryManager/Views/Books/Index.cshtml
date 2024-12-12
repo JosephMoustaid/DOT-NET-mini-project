@@ -1,0 +1,190 @@
+﻿@model IEnumerable<LibraryManager.Models.Book>
+
+@{
+    ViewData["Title"] = "Books";
+}
+
+<!-- Main content header -->
+<h1 class="text-center my-5 text-primary animated fadeInUp">Books</h1>
+
+<!-- Search Bar -->
+<div class="row mb-4">
+    <div class="col-md-6 offset-md-3">
+        <div class="input-group">
+            <input type="text" class="form-control" id="searchBar" placeholder="Search for a book..." aria-label="Search for a book..." aria-describedby="basic-addon2" />
+        </div>
+    </div>
+</div>
+
+<!-- Book Cards with hover effects -->
+<div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-4" id="bookList">
+    @foreach (var book in Model)
+    {
+        <div class="col book-item" data-title="@book.Title" data-author="@book.Author" data-isbn="@book.ISBN">
+            <div class="card shadow-sm bg-light rounded h-100 animated fadeInUp">
+                <img src="@book.CoverImage" class="card-img-top" alt="Cover Image" title="View Cover on Full screen mode" data-toggle="modal" data-target="#coverModal-@book.Id" />
+                <div class="card-body">
+                    <h5 class="card-title">@book.Title</h5>
+                    <p class="card-text"><strong>Author:</strong> @book.Author</p>
+                    <p class="card-text"><strong>ISBN:</strong> @book.ISBN</p>
+                    <p class="card-text"><strong>Published:</strong> @book.PublishedDate.ToShortDateString()</p>
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Edit" asp-route-id="@book.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@book.Id" class="btn btn-danger btn-sm">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Book Cover -->
+        <div class="modal fade" id="coverModal-@book.Id" tabindex="-1" aria-labelledby="coverModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="coverModalLabel">Book Cover - @book.Title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="modal-body text-center">
+                        <img src="@book.CoverImage" class="img-fluid rounded shadow" alt="Book Cover for @book.Title" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+    }
+</div>
+
+
+<!-- JavaScript for Real-Time Search -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchBar = document.getElementById('searchBar');
+        const bookList = document.getElementById('bookList');
+        const books = document.querySelectorAll('.book-item');
+
+        searchBar.addEventListener('input', (e) => {
+            const searchQuery = e.target.value.toLowerCase();
+
+            books.forEach((book) => {
+                const title = book.getAttribute('data-title').toLowerCase();
+                const author = book.getAttribute('data-author').toLowerCase();
+                const isbn = book.getAttribute('data-isbn').toLowerCase();
+
+                // Show or hide the book based on the search query
+                if (title.includes(searchQuery) || author.includes(searchQuery) || isbn.includes(searchQuery)) {
+                    book.style.display = 'block';
+                } else {
+                    book.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
+
+<!-- Modal script (requires Bootstrap JS) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- JavaScript for Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+<!-- FontAwesome for Icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+
+<!-- Custom CSS for animations -->
+<style>
+    /* Fade In Up Animation */
+    .fadeInUp {
+        animation-name: fadeInUp;
+        animation-duration: 1s;
+        animation-timing-function: ease-out;
+    }
+
+    keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translate3d(0, 30px, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+    /* Bounce In Animation for Button */
+    .bounceIn {
+        animation-name: bounceIn;
+        animation-duration: 1s;
+    }
+
+    keyframes bounceIn {
+        0% {
+            transform: scale(0.3);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* Card Hover Effect */
+    .card:hover {
+        transform: translateY(-10px);
+        transition: transform 0.3s ease;
+    }
+
+    /* Search Bar styling */
+    #searchBar {
+        border-radius: 50px;
+        padding: 10px 20px;
+    }
+
+    /* Button Hover Effects */
+    .btn-success:hover {
+        background-color: #28a745;
+        transform: scale(1.05);
+    }
+
+    .btn-warning:hover {
+        background-color: #ffc107;
+        transform: scale(1.05);
+    }
+
+    .btn-danger:hover {
+        background-color: #dc3545;
+        transform: scale(1.05);
+    }
+
+</style>
+
+<!-- Custom JavaScript for Search Bar functionality -->
+<script>
+    document.getElementById('searchBar').addEventListener('input', function(e) {
+        var query = e.target.value.toLowerCase();
+        var rows = document.querySelectorAll('table tbody tr');
+        
+        rows.forEach(function(row) {
+            var title = row.cells[1].textContent.toLowerCase();
+            var author = row.cells[2].textContent.toLowerCase();
+            var isbn = row.cells[3].textContent.toLowerCase();
+
+            if (title.includes(query) || author.includes(query) || isbn.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+
